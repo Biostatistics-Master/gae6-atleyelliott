@@ -1,6 +1,6 @@
 ---
 title: "GAE6: Pea Aphids: multiple comparisons"
-author: "Your Name Here"
+author: "Atley Elliott"
 format: 
   html:
     embed-resources: true
@@ -155,5 +155,63 @@ ggplot(aphids)+
   )
 
 ```
+
+```{r}
+#| label: tbl-planned
+#| tbl-cap: "Planned hypothesis test"
+
+aphidMeans <-emmeans(aphidMod, "Treatment")
+
+aphidCont <- tidy(contrast(
+  aphidMeans,
+  method = list(
+    #                           Un-Inj  Un-INF  INF
+    'Control vs Sham & Inf' = c(    2,    -1,   -1),
+    'Uninfected vs Infect'  = c(    2,    -1,   -1)
+   ),
+ adjust = "none"
+ ))[,-c(1,3)]
+
+aphidCont$p.value <-format.pval(
+  aphidCont$p.value,
+  digits = 3,
+  eps = 0.01,
+  na.form = ''
+)
+
+kbl(
+  aphidCont,
+  col.names = c(
+    "Contrast",
+    "Estimate",
+    "SE",
+    "df",
+    "t",
+    "p"
+   ),
+  digits = c(0,3,3,0,3,3),
+  align = "r",
+  table.attr = 'data-quarto-disable-processing="true"'
+) |>
+  kable_classic(full = FALSE)
+
+```
+
+```{r}
+#| label: tbl-Tukey
+#| tbl-cap: "All pair-wise comparisons of means with the Tukey correction to protect the experimentwize error rate at 0.05 "
+
+
+kbl(
+  pairs(aphidMeans),
+  digits = 4,
+  table.attr='data-quarto-disable-processing="true"'
+) |>
+  kable_classic(full= FALSE)
+  
+
+```
+
+The p-values for the Control-uninfected comparison and the Control-Infected values are the only ones that have significantly different means.
 
 ## References:
